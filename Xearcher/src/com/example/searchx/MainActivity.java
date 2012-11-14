@@ -10,6 +10,17 @@ import android.widget.Button;
 
 public class MainActivity extends Activity {
 	
+		public class Button5ClickListener implements OnClickListener {
+
+		public void onClick(View v) {
+			Intent intent5 = new Intent(MainActivity.this, com.example.searchx.SubActivity.class);
+			rsp = "Result";
+			intent5.putExtra("RESP", rsp);
+			startActivity(intent5);
+		}
+
+	}
+
 		String rsp;
 		
     public class Button3ClickListener implements OnClickListener {
@@ -58,6 +69,9 @@ public class MainActivity extends Activity {
         
         Button myBtn3 = (Button) findViewById(R.id.button3);
         myBtn3.setOnClickListener(new Button3ClickListener());
+        
+        Button myBtn5 = (Button) findViewById(R.id.button5);
+        myBtn5.setOnClickListener(new Button5ClickListener());
     }
 
     @Override

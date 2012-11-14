@@ -35,6 +35,7 @@ public class SubActivity extends Activity {
 	Intent intent1;   
 	@SuppressLint("NewApi")
 	
+	// 1stChildren
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LinearLayout layout = (LinearLayout) this.getLayoutInflater().inflate(R.layout.subw, null);
@@ -47,6 +48,8 @@ public class SubActivity extends Activity {
         Button myBtn4 = (Button) findViewById(R.id.button4);
         myBtn4.setOnClickListener(new Button4ClickListener());
         
+        a = 0;
+        b = 0;
         
         //インテントの処理
         intent1 = getIntent();
@@ -62,10 +65,9 @@ public class SubActivity extends Activity {
             URLConnection connection = url.openConnection();
             parser.setInput(connection.getInputStream(), "UTF-8");
             
-            // タグ名(以下OK)
+            // タグ名
             String tag = "";
             String value = "";
-
             
             // XMLの解析
             for (int type = parser.getEventType(); type != XmlPullParser.END_DOCUMENT; type = parser.next()) {
@@ -77,13 +79,13 @@ public class SubActivity extends Activity {
                     value = parser.getText();  // 空白で取得したものは全て処理対象外とする
                     if(value.trim().length() != 0) {
                         if(tag.equals("hyou")) {
-                        	// ここから
                             String data1 = "1";  // yesの数
                             String data2 = "2";  // noの数                
                             Pattern pattern1 = Pattern.compile(data1);
                             Matcher matcher1 = pattern1.matcher(value);
                             Pattern pattern2 = Pattern.compile(data2);
-                            Matcher matcher2 = pattern2.matcher(value);                          
+                            Matcher matcher2 = pattern2.matcher(value);
+                            
                             while (matcher1.find()) {
                                 a++;
                             }
@@ -92,7 +94,6 @@ public class SubActivity extends Activity {
                             }
                             DrawView dview = new DrawView(getApplication());                         
                             layout.addView(dview);
-                            // ここまでは文字列検索でつけたした。以前このif句はtview.setText(value);のみだった。
                         } 
                     }
                     break;
@@ -106,33 +107,56 @@ public class SubActivity extends Activity {
     }
 }
 
+@SuppressLint({ "DrawAllocation"})
 class DrawView extends View 
 {
 
 	  public DrawView(Context context) {
-	    super(context);
+	    super(context);	    
 	  }
-
-	//フィールド:投票数
-	  	int a01 = SubActivity.a;
-	  	int b01 = SubActivity.b;
 
 		//フィールド：円周角
 		private int agr;
 		private int dis;
 		private int ind;
+		private int mid;
 
 		//投票数・戻り値2
+		int getA() {
+			int a = SubActivity.a;
+			return a;
+			}
+		
+        int getB() {
+        	int b = SubActivity.b;
+        	return b;
+        	}
+        
+		int getD() {
+			int d = 0;
+	        if (SubActivity.a == 0 && SubActivity.b == 0) {
+	        	d = 1;
+	        }   
+			return d;
+			}
 
 		int getAgr() {
-			agr = 360*a01/(a01+b01);
+			//戻り値2
+			int a = getA();
+			int b = getB();
+			int d = getD();
+
+			agr = 360*a/(a+b+d);
 			return agr;
 		}
 
 		int getDis() {
+			//戻り値
+			int a = getA();
+			int b = getB();
+			int d = getD();
 
-
-			dis = 360*b01/(a01+b01);
+			dis = 360*b/(a+b+d);
 			return dis;
 		}
 
@@ -141,6 +165,15 @@ class DrawView extends View
 			return ind;
 		}
 
+		int getMid() {
+			//戻り値
+			int a = getA();
+			int b = getB();
+			int d = getD();
+
+			mid = 360*d/(a+b+d);
+		    return mid;
+		}
 
 	  public void onDraw(Canvas c) {
 
@@ -148,6 +181,7 @@ class DrawView extends View
 		int agr= getAgr();
 		int dis= getDis();
         int ind= getInd();
+	    int mid= getMid();
 
 		c.drawColor(Color.WHITE);
 		
@@ -162,16 +196,20 @@ class DrawView extends View
 	    c.drawArc(new RectF(10.0f,10.0f,200.0f,150.0f), 0, agr, true, paint);
 	    paint.setColor(Color.BLUE);
 	    c.drawArc(new RectF(10.0f,10.0f,200.0f,150.0f), agr, dis, true, paint);
+	    paint.setColor(Color.GRAY);
+	    c.drawArc(new RectF(10.0f,10.0f,200.0f,150.0f), ind, mid, true, paint);
 
-
+	    int a = getA();
+        int b = getB();
+        int d = getD();
 
 	    //結果表示
         paint.setColor(Color.BLACK);
+        c.drawText("結果", 280, 80, paint);
         paint.setColor(Color.RED);
-        c.drawText("賛成"+a01,280,100,paint);
+        c.drawText("賛成"+a,280,100,paint);
         paint.setColor(Color.BLUE);
-        c.drawText("反対"+b01,280,120,paint);
+        c.drawText("反対"+b,280,120,paint);
         paint.setColor(Color.GRAY);
-
 	  }
-}	
+}
